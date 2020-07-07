@@ -15,22 +15,29 @@ class Api::V1::BooksController < ApplicationController
     end
 
     def create 
-        book = Book.new(books_params)
+        book = Book.new(book_params)
         if book.save 
-            render json: book, status: :accepted
+            render json: BookSerializer.new(book), status: :accepted
         else
             render json: { errors: book.errors.full_messages }, status: :unprocessable_entity 
         end
     end
 
     def destroy 
+        book = book.find(params[:id])
         book.destroy
-        format.json {head :no_content}
+        respond_to do |format|
+            format.html {
+                redirect_to standups_url, notice: 'Book was successfully destroyed.'
+        }
+        format.json { head :no_content }
+         end
+        
     end
 
     private
 
-    def books_params 
-        params.require(:books).permit( :title, :author, :genre, :image_url, :description, :genre_id)
+    def book_params 
+        params.require(:book).permit(:title, :author, :genre, :image_url, :description, :genre_id)
     end
 end
